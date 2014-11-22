@@ -10,6 +10,7 @@ mod.directive 'infiniteScroll', ['$rootScope', '$window', '$timeout', 'THROTTLE_
     infiniteScrollDistance: '='
     infiniteScrollDisabled: '='
     infiniteScrollUseDocumentBottom: '='
+    infiniteScrollTop: '='
 
   link: (scope, elem, attrs) ->
     windowElement = angular.element($window)
@@ -60,8 +61,16 @@ mod.directive 'infiniteScroll', ['$rootScope', '$window', '$timeout', 'THROTTLE_
       remaining = elementBottom - containerBottom
       shouldScroll = remaining <= height(container) * scrollDistance + 1
 
+      if attrs.infiniteScrollTop?
+        topScrollCondition = !!container.height() && container.scrollTop() is 0
+        shouldScroll = topScrollCondition if !shouldScroll
+
       if shouldScroll
         checkWhenEnabled = true
+
+        if attrs.infiniteScrollTop?
+          scope.infiniteScrollTop = topScrollCondition
+          scope.$apply(scope.infiniteScrollTop)
 
         if scrollEnabled
           if scope.$$phase || $rootScope.$$phase
