@@ -1,10 +1,10 @@
 {
   "name": "ng-infinite-scroll",
-  "version": "1.1.2",
+  "version": "scroll-direction",
   "description": "Infinite scrolling for AngularJS",
   "repository": {
     "type": "git",
-    "url": "git://github.com/sroze/ngInfiniteScroll.git"
+    "url": "git://github.com/dhalai/ngInfiniteScroll.git"
   },
   "browser": "build/ng-infinite-scroll.js",
   "scripts": {
