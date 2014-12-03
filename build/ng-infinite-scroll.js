@@ -1,4 +1,4 @@
-/* ng-infinite-scroll - v1.1.2 - 2014-11-22 */
+/* ng-infinite-scroll - v1.1.2 - 2014-12-03 */
 var mod;
 
 mod = angular.module('infinite-scroll', []);
@@ -14,10 +14,12 @@ mod.directive('infiniteScroll', [
         infiniteScrollDistance: '=',
         infiniteScrollDisabled: '=',
         infiniteScrollUseDocumentBottom: '=',
-        infiniteScrollTop: '='
+        infiniteScrollTop: '=',
+        infiniteScrollCustom: '@'
       },
       link: function(scope, elem, attrs) {
-        var changeContainer, checkWhenEnabled, container, handleInfiniteScrollContainer, handleInfiniteScrollDisabled, handleInfiniteScrollDistance, handleInfiniteScrollUseDocumentBottom, handler, height, immediateCheck, offsetTop, pageYOffset, scrollDistance, scrollEnabled, throttle, useDocumentBottom, windowElement;
+        var changeContainer, checkWhenEnabled, container, handleInfiniteScrollContainer, handleInfiniteScrollDisabled, handleInfiniteScrollDistance, handleInfiniteScrollUseDocumentBottom, handler, height, immediateCheck, offsetTop, pageYOffset, scrollDistance, scrollEnabled, throttle, useDocumentBottom, windowElement, _container,
+          _this = this;
         windowElement = angular.element($window);
         scrollDistance = null;
         scrollEnabled = null;
@@ -166,7 +168,24 @@ mod.directive('infiniteScroll', [
         scope.$watch('infiniteScrollContainer', handleInfiniteScrollContainer);
         handleInfiniteScrollContainer(scope.infiniteScrollContainer || []);
         if (attrs.infiniteScrollParent != null) {
-          changeContainer(angular.element(elem.parent()));
+          _container = angular.element(elem.parent());
+          changeContainer(_container);
+          if ((attrs.infiniteScrollCustom != null) && scope.infiniteScrollCustom) {
+            _container.on("customScroll", function(event, scrollData) {
+              if (scrollData.scrollPercent >= 99) {
+                checkWhenEnabled = true;
+                if (scrollEnabled) {
+                  if (scope.$$phase || $rootScope.$$phase) {
+                    return scope.infiniteScroll();
+                  } else {
+                    return scope.$apply(scope.infiniteScroll);
+                  }
+                }
+              } else {
+                return checkWhenEnabled = false;
+              }
+            });
+          }
         }
         if (attrs.infiniteScrollImmediateCheck != null) {
           immediateCheck = scope.$eval(attrs.infiniteScrollImmediateCheck);

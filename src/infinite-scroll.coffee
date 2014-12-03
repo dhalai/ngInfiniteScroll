@@ -11,6 +11,7 @@ mod.directive 'infiniteScroll', ['$rootScope', '$window', '$timeout', 'THROTTLE_
     infiniteScrollDisabled: '='
     infiniteScrollUseDocumentBottom: '='
     infiniteScrollTop: '='
+    infiniteScrollCustom: '@'
 
   link: (scope, elem, attrs) ->
     windowElement = angular.element($window)
@@ -184,7 +185,22 @@ mod.directive 'infiniteScroll', ['$rootScope', '$window', '$timeout', 'THROTTLE_
     # infinite-scroll-parent establishes this element's parent as the
     # container infinitely scrolled instead of the whole window.
     if attrs.infiniteScrollParent?
-      changeContainer angular.element elem.parent()
+      _container = angular.element elem.parent()
+
+      changeContainer _container
+
+      if attrs.infiniteScrollCustom? and scope.infiniteScrollCustom
+        _container.on "customScroll", (event, scrollData) =>
+          if scrollData.scrollPercent >= 99
+            checkWhenEnabled = true
+            if scrollEnabled
+              if scope.$$phase or $rootScope.$$phase
+                scope.infiniteScroll()
+              else
+                scope.$apply scope.infiniteScroll
+          else
+            checkWhenEnabled = false
+
 
     # infinte-scoll-immediate-check sets whether or not run the
     # expression passed on infinite-scroll for the first time when the
